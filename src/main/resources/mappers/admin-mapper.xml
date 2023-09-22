@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<mapper namespace="adminMapper">
+
+    <!--카테고리 검색-->
+    <select id="selectCate" resultMap="itemMapper.cate">
+        SELECT CATE_NAME,
+        CATE_CODE
+        FROM ITEM_CATEGOTY
+    </select>
+
+    <!--다음 item_code 조회 -->
+    <select id="selectNextItemCode" resultType="String">
+        SELECT 'ITEM_'||LPAD((NVL(MAX(TO_NUMBER(SUBSTR(ITEM_CODE, 6))),0)+1),3,'0')
+        FROM SHOP_ITEM
+    </select>
+    <!--상품 등록-->
+    <insert id="insertItem">
+        INSERT INTO SHOP_ITEM(
+            ITEM_CODE
+            , ITEM_NAME
+            , ITEM_PRICE
+            , ITEM_INTRO
+            , CATE_CODE
+        )
+        VALUES(
+            #{itemCode}
+            , #{itemName}
+            , #{itemPrice}
+            , #{itemIntro}
+            , #{cateCode}
+        )
+    </insert>
+    <!--상품 목록 검색-->
+    <select id="selectItemList" resultMap="itemMapper.item">
+        SELECT ITEM_CODE
+            , ITEM_NAME
+            , ITEM_PRICE
+            , ITEM_STOCK
+            , ITEM_STATUS
+        FROM SHOP_ITEM
+        WHERE 1 = 1 <!--항상 참인 WHERE절을 넣어서 후에 IF문에 AND만 넣어도 돌아가게 만듦-->
+        <if test='searchCateCode != null and !searchCateCode.equals("")'>
+            AND CATE_CODE = #{searchCateCode}
+        </if>
+        <if test='searchItemStatus != null'>
+            AND ITEM_STATUS IN
+            <foreach collection="searchItemStatus" item="itemStatus" separator="," open="(" close=")">
+                #{itemStatus}
+            </foreach>
+        </if>
+        <if test='searchItemName != null and !searchItemName.equals("")'>
+            AND UPPER(ITEM_NAME) LIKE '%'||UPPER(#{searchItemName})||'%'
+        </if>
+        <if test='searchItemStockMin != null and !searchItemStockMin.equals("")'>
+            AND ITEM_STOCK &gt;= #{searchItemStockMin}
+        </if>
+        <if test='searchItemStockMax != null and !searchItemStockMax.equals("")'>
+            AND ITEM_STOCK &lt;= #{searchItemStockMax}
+        </if>
+        ORDER BY ITEM_CODE DESC
+    </select>
+
+    <!--상품 재고 변경-->
+    <update id="updateStock">
+        UPDATE SHOP_ITEM
+        SET ITEM_STOCK = #{itemStock}
+        WHERE ITEM_CODE = #{itemCode}
+    </update>
+
+    <!--상품 상태 변경-->
+    <update id="updateStatus">
+        UPDATE SHOP_ITEM
+        SET ITEM_STATUS = #{itemStatus}
+        WHERE ITEM_CODE = #{itemCode}
+    </update>
+
+    <insert id="insertImgs">
+
+        INSERT INTO ITEM_IMG (
+            IMG_CODE
+            , ORIGIN_FILE_NAME
+            , ATTACHED_FILE_NAME
+            , ITEM_CODE
+            , IS_MAIN
+        )
+        <foreach collection="imgList" item="img" separator="UNION ALL" index="idx">
+            SELECT (SELECT 'IMG_'||LPAD((NVL(MAX(TO_NUMBER(SUBSTR(IMG_CODE, 5))),0)+1+#{idx}),3,'0')
+                    FROM ITEM_IMG)
+                , #{img.originFileName}
+                , #{img.attachedFileName}
+                , #{img.itemCode}
+                , #{img.isMain}
+            FROM DUAL
+        </foreach>
+    </insert>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

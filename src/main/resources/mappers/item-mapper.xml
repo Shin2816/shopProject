@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<mapper namespace="itemMapper">
+    <resultMap id="cate" type="com.green.Shop.item.vo.CateVO">
+        <id column="CATE_CODE"   property="cateCode"/>
+        <result column="CATE_NAME"   property="cateName"/>
+    </resultMap>
+
+    <resultMap id="item" type="com.green.Shop.item.vo.ItemVO">
+        <id column="ITEM_CODE"      property="itemCode"/>
+        <result column="ITEM_NAME"      property="itemName"/>
+        <result column="ITEM_PRICE"     property="itemPrice"/>
+        <result column="ITEM_INTRO"     property="itemIntro"/>
+        <result column="ITEM_STOCK"     property="itemStock"/>
+        <result column="CATE_CODE"      property="cateCode"/>
+        <result column="ITEM_STATUS"    property="itemStatus"/>
+        <collection property="imgList" resultMap="img"/>
+    </resultMap>
+<!--association 태그는 1:1 관계에서 사용 가능.-->
+    <resultMap id="img" type="com.green.Shop.item.vo.ImgVO">
+        <id column="IMG_CODE"           property="imgCode" />
+        <result column="ORIGIN_FILE_NAME"   property="originFileName" />
+        <result column="ATTACHED_FILE_NAME" property="attachedFileName" />
+        <result column="ITEM_CODE"          property="itemCode" />
+        <result column="IS_MAIN"            property="isMain" />
+    </resultMap>
+
+    <select id="selectMemberItemList" resultMap="item">
+        SELECT SHOP.ITEM_CODE
+        , ITEM_NAME
+        , ITEM_PRICE
+        , ITEM_INTRO
+        , ATTACHED_FILE_NAME
+        FROM SHOP_ITEM SHOP, ITEM_IMG IMG, ITEM_CATEGOTY CATE
+        WHERE SHOP.ITEM_CODE = IMG.ITEM_CODE
+        AND CATE.CATE_CODE = SHOP.CATE_CODE
+        AND IS_MAIN = 'Y'
+        AND ITEM_STATUS = 1
+        <if test='cateCode != null'>
+            AND CATE.CATE_CODE = #{cateCode}
+        </if>
+        ORDER BY ITEM_CODE DESC
+    </select>
+
+    <select id="selectItemDetail" resultMap="item">
+        SELECT SHOP.ITEM_CODE
+        , ITEM_NAME
+        , ITEM_PRICE
+        , ITEM_INTRO
+        , ATTACHED_FILE_NAME
+        , IS_MAIN
+        FROM SHOP_ITEM SHOP, ITEM_IMG IMG
+        WHERE SHOP.ITEM_CODE = IMG.ITEM_CODE
+        AND SHOP.ITEM_CODE=#{itemCode}
+        ORDER BY ITEM_CODE DESC
+    </select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

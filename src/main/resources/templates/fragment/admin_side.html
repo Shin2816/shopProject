@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+    <th:block th:fragment="adminSideFragment">
+        <div class="row">
+            <div class="col">
+                <div class="list-group">
+
+                    <a th:each="subMenu, state : ${subMenuList}" th:href="@{${subMenu.subMenuUrl}(menuCode=${subMenu.menuCode}, subMenuCode=${subMenu.subMenuCode})}" class="list-group-item list-group-item-action" th:classappend="${subMenu.subMenuCode == subMenuVO.subMenuCode ? 'active' : ''}">[[${subMenu.subMenuName}]]</a>
+
+                    <!-- 
+                    <a href="/admin/regItemForm" class="list-group-item list-group-item-action active" aria-current="true">
+                        상품 등록
+                    </a>
+                     -->
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

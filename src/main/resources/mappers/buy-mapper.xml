@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<mapper namespace="buyMapper">
+	<resultMap id="buy" type="com.green.Shop.buy.vo.BuyVO">
+        <id column="BUY_CODE"               property="buyCode"/>
+        <result column="MEMBER_ID"          property="memberId"/>
+        <result column="BUY_TOTAL_PRICE"    property="buyTotalPrice"/>
+        <result column="BUY_DATE"           property="buyDate"/>
+        <collection property="buyDetailList" resultMap="buyDetail"/>
+    </resultMap>
+
+    <resultMap id="buyDetail" type="com.green.Shop.buy.vo.BuyDetailVO">
+        <id column="BUY_DETAIL_CODE"        property="buyDetailCode"/>
+        <result column="ITEM_CODE"          property="itemCode"/>
+        <result column="BUY_CNT"            property="buyCnt"/>
+        <result column="BUY_PRICE"          property="buyPrice"/>
+        <result column="BUY_CODE"           property="buyCode"/>
+        <association property="itemVO" resultMap="itemMapper.item"/>
+    </resultMap>
+
+
+    <!--다음 구매 시 들어갈 buy_code 값 조회-->
+    <select id="selectNextByCode" resultType="String">
+        SELECT 'BUY_'||LPAD((NVL(MAX(TO_NUMBER(SUBSTR(BUY_CODE, 6))),0)+1),3,'0')
+        FROM SHOP_BUY
+    </select>
+
+    <!--구매 목록 조회-->
+    <select id="selectBuyList" resultMap="buy">
+        SELECT SB.BUY_CODE
+        , BUY_TOTAL_PRICE
+        , TO_CHAR(BUY_DATE, 'YYYY-MM-DD HH24:MI') BUY_DATE
+        , ITEM_NAME
+        , ITEM_PRICE
+        , BUY_CNT
+        , BUY_PRICE
+        , ATTACHED_FILE_NAME
+        FROM SHOP_BUY SB, SHOP_ITEM SI, BUY_DETAIL BD, ITEM_IMG II
+        WHERE SB.BUY_CODE = BD.BUY_CODE
+        AND SI.ITEM_CODE = BD.ITEM_CODE
+        AND SI.ITEM_CODE = II.ITEM_CODE
+        AND MEMBER_ID = #{memberId}
+        AND IS_MAIN = 'Y'
+        ORDER BY BUY_DATE DESC
+    </select>
+
+    <!--구매정보 insert-->
+    <insert id="insertBuy">
+        INSERT INTO SHOP_BUY(
+        BUY_CODE
+        , MEMBER_ID
+        , BUY_TOTAL_PRICE
+        )
+        VALUES(
+        #{buyCode}
+        , #{memberId}
+        , #{buyTotalPrice}
+        )
+    </insert>
+
+    <!--directBuy insert 구문-->
+    <insert id="directBuyDetail">
+        INSERT INTO BUY_DETAIL(
+            BUY_DETAIL_CODE
+            , ITEM_CODE
+            , BUY_CNT
+            , BUY_PRICE
+            , BUY_CODE
+        ) VALUES (
+            #{buyCode}||'_1'
+            , #{itemCode}
+            , #{buyCnt}
+            , #{buyPrice}
+            , #{buyCode}
+        )
+
+    </insert>
+
+    <!--구매 정보 상세 insert-->
+    <insert id="insertBuyDetail">
+        INSERT INTO BUY_DETAIL
+        (BUY_DETAIL_CODE
+        , ITEM_CODE
+        , BUY_CNT
+        , BUY_PRICE
+        , BUY_CODE)
+        <foreach collection="buyDetailList" item="list" separator="UNION ALL" index="idx">
+            SELECT
+            #{buyCode}||'_'||(#{idx}+1)
+            , #{list.itemCode}
+            , #{list.buyCnt}
+            , #{list.buyPrice}
+            , #{buyCode}
+            FROM DUAL
+        </foreach>
+    </insert>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

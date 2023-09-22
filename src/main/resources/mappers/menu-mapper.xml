@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<mapper namespace="menuMapper">
+    <resultMap id="menu" type="com.green.Shop.admin.vo.MenuVO">
+        <id column="MENU_CODE"      property="menuCode"/>
+        <result column="MENU_NAME"  property="menuName"/>
+        <result column="MENU_URL"   property="menuUrl"/>
+    </resultMap>
+
+    <resultMap id="subMenu" type="com.green.Shop.admin.vo.SubMenuVO">
+        <id column="SUB_MENU_CODE"      property="subMenuCode"/>
+        <result column="SUB_MENU_NAME"  property="subMenuName"/>
+        <result column="SUB_MENU_URL"   property="subMenuUrl"/>
+        <result column="MENU_CODE"      property="menuCode"/>
+    </resultMap>
+
+    <!--메뉴 목록 조회-->
+    <select id="selectMenuList" resultMap="menu">
+        SELECT MENU_CODE
+            , MENU_NAME
+            , MENU_URL
+        FROM SHOP_MENU
+        ORDER BY MENU_CODE
+    </select>
+    <!--서브 메뉴 목록 조회-->
+    <select id="selectSubMenuList" resultMap="subMenu">
+        SELECT SUB_MENU_CODE
+            ,SUB_MENU_NAME
+            ,SUB_MENU_URL
+            ,MENU_CODE
+        FROM SHOP_SUB_MENU
+        WHERE MENU_CODE = #{menuCode}
+    </select>
+    <!--일반 메뉴 조회-->
+    <select id="selectCateMenu" resultMap="itemMapper.cate">
+        SELECT CATE_CODE
+            ,CATE_NAME
+        FROM ITEM_CATEGOTY
+    </select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{fragment/main_layout}" >
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <div class="row row-cols-5 g-4">
+            <th:block th:each="item, state : ${MemberItemList}">
+                <div class="col">
+                    <div class="card cursor-span" style="width: 15rem;" th:onclick="|location.href='@{/item/itemDetail(itemCode=${item.itemCode})}'|">
+                        <img th:src="${'/images/'+item.imgList[0].attachedFileName}" class="card-img-top" th:alt="${item.itemIntro}">
+                        <div class="card-body">
+                            <h5 class="card-title">책 이름 : [[${item.itemName}]]</h5>
+                            <p class="card-text">가격 : [[${#numbers.formatCurrency(item.itemPrice)}]]</p>
+                            <p class="card-text">책 소개 : [[${item.itemIntro}]]</p>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+    </th:block>
+</body>
+</html>

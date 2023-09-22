@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{fragment/admin_layout}" >
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <h4>상품 등록 페이지</h4>
+        <form action="/admin/regItem" method="post" enctype="multipart/form-data">
+            <div class="row mb-3">
+                <div class="col-4">
+                    <select class="form-select" name="cateCode">
+                        <option selected>카테고리를 고르세요</option>
+                        <th:block th:each="cate : ${cateList}">
+                            <option th:value="${cate.cateCode}">[[${cate.cateName}]]</option>
+                        </th:block>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4">
+                    상품명 <input type="text" class="form-control" id="itemName" name="itemName">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4">
+                    가격 <input type="text" class="form-control" id="itemPrice" name="itemPrice">
+                </div>
+            </div>                
+            <div class="row mb-3">
+                <div class="col-6">
+                    상품설명
+                    <textarea class="form-control" id="itemIntro" name="itemIntro"></textarea>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-6">
+                    메인 이미지
+                    <input type="file" class="form-control" name="mainImg">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-6">
+                    서브 이미지
+                    <input type="file" class="form-control" name="subImg" multiple>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4 offset-5">
+                    <input type="submit" class="btn btn-primary" value="상품등록">
+                </div>
+            </div>
+        </form>
+    </th:block>
+</body>
+</html>

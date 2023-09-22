@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{fragment/main_layout}" >
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <form action="/buy/directBuy" method="post">
+            <input type="hidden" name="itemCode" th:value="${item.itemCode}">
+            <input type="hidden" name="buyPrice" th:value="${item.itemPrice}">
+            <div class="item-detail-info">
+                <div class="item-img">
+                    <img class="item-detail-main" th:each="img : ${item.imgList}" th:if="${img.isMain=='Y'}"  th:src="${'/images/'+img.attachedFileName}" alt="">
+                </div>
+                <div class="item-info">
+                    <div>
+                        <p>상품명</p>
+                        <p>[[${item.itemName}]]</p>
+                    </div>
+                    <div>
+                        <p>가격</p>
+                        <p>[[${#numbers.formatCurrency(item.itemPrice)}]]</p>
+                    </div>
+                    <div>
+                        <p>수량</p>
+                        <p>                                         <!-- data-aaa-bbb -> aaaBbb -->
+                            <input name="buyCnt" class="form-control" type="number" value="1" th:data-item-price="${item.itemPrice}">
+                        </p>
+                    </div>
+                    <div>
+                        <p>총가격</p>
+                        <p class="item-price-sum">[[${#numbers.formatCurrency(item.itemPrice * 1)}]]</p>
+                    </div>
+                    <div class="item-info-btn">
+                        <p>
+                            <button type="button" class="btn btn-primary" th:onclick="goCartList([[${session.loginInfo}]], [[${item.itemCode}]]);">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-check" viewBox="0 0 16 16">
+                                <path d="M11.354 6.354a.5.5 0 0 0-.708-.708L8 8.293 6.854 7.146a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"/>
+                                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            </svg>
+                            장바구니 담기
+                            </button>
+                        </p>
+                        <p><input type="submit" class="btn btn-primary" value="바로 구매"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col text-center">
+                    <h3>상품 설명입니다.</h3>
+                    <p>[[${item.itemIntro}]]</p>
+                </div>
+            </div>
+            <div class="row">
+                <div th:each="item : ${item.imgList}" class="col">
+                    <th:block th:if="${item.isMain == 'N'}">
+                        <img class="item-detail-sub" th:src="${'/images/'+item.attachedFileName}" alt="">
+                    </th:block>
+                </div>
+            </div>
+        </form>
+        <script src="/js/item/item_detail.js"></script>
+    </th:block>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{fragment/main_layout}" >
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-4">
+                <form action="/member/login" method="post">
+                    <div class="row mb-3">
+                        <label for="memberId" class="col-form-label">아이디</label>
+                        <div class="col">
+                            <input type="text" class="form-control" id="memberId" name="memberId" placeholder="아이디를 적으세요." th:value="${memberVO.memberId}">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="memberPw" class="col-form-label">비밀번호</label>
+                        <div class="col">
+                            <input type="password" class="form-control" id="memberPw" name="memberPw" placeholder="비밀번호를 적으세요.">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col d-grid">
+                            <input type="submit" class="btn btn-primary" value="로그인"></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

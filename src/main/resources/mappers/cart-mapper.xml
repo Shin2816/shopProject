@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<mapper namespace="cartMapper">
+    <resultMap id="cart" type="com.green.Shop.cart.vo.CartVO">
+        <id     column="CART_CODE"       property="cartCode"/>
+        <result column="ITEM_CODE"       property="itemCode"/>
+        <result column="MEMBER_ID"       property="memberId"/>
+        <result column="CART_CNT"        property="cartCnt"/>
+        <result column="PUT_DATE"        property="putDate"/>
+        <association property="itemList" resultMap="itemMapper.item"/>
+    </resultMap>
+
+    <insert id="insertCart">
+        MERGE INTO SHOP_CART
+        USING DUAL
+        ON (MEMBER_ID = #{memberId}
+            AND CART_CODE = (SELECT CART_CODE FROM SHOP_CART
+                 WHERE ITEM_CODE = #{itemCode}))
+        WHEN MATCHED THEN
+            UPDATE SET CART_CNT = CART_CNT + #{cartCnt}
+        WHEN NOT MATCHED THEN
+            INSERT (
+                CART_CODE
+                , ITEM_CODE
+                , MEMBER_ID
+                , CART_CNT
+            ) VALUES(
+                (SELECT 'CART_'||LPAD((NVL(MAX(TO_NUMBER(SUBSTR(CART_CODE, 6))),0)+1),3,'0') FROM SHOP_CART)
+                , #{itemCode}
+                , #{memberId}
+                , #{cartCnt}
+            )
+    </insert>
+    <select id="selectCartList" resultMap="cart">
+        SELECT CART_CODE
+        , CART.ITEM_CODE
+        , CART_CNT
+        , ITEM_NAME
+        , ITEM_PRICE
+        , ATTACHED_FILE_NAME
+        FROM SHOP_ITEM SHOP, ITEM_IMG IMG, SHOP_CART CART
+        WHERE SHOP.ITEM_CODE = IMG.ITEM_CODE
+        AND SHOP.ITEM_CODE = CART.ITEM_CODE
+        AND IS_MAIN = 'Y'
+        AND CART.MEMBER_ID = #{memberId}
+        ORDER BY PUT_DATE DESC
+    </select>
+
+    <delete id="deleteCart">
+        DELETE SHOP_CART
+        WHERE CART_CODE IN
+        <foreach collection="cartCodes" item="cart" separator="," open="(" close=")">
+            #{cart}
+        </foreach>
+    </delete>
+
+    <update id="updateCartCnt">
+        UPDATE SHOP_CART
+        SET CART_CNT = #{cartCnt}
+        WHERE CART_CODE = #{cartCode}
+    </update>
+
+    <!--장바구니 품목 구매 시, 사용되는 쿼리-->
+    <select id="selectCartListForBuy" resultMap="buyMapper.buyDetail">
+        SELECT ITEM_CODE
+            , CART_CNT AS BUY_CNT
+            , (SELECT ITEM_PRICE FROM SHOP_ITEM WHERE ITEM_CODE = SHOP_CART.ITEM_CODE) * CART_CNT AS BUY_PRICE
+        FROM SHOP_CART
+        WHERE CART_CODE IN
+        <foreach collection="cartCodes" item="cartCode" separator="," open="(" close=")">
+            #{cartCode}
+        </foreach>
+    </select>
+
+</mapper>
